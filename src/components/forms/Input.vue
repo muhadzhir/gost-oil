@@ -15,7 +15,7 @@
 <script lang="ts" setup>
   defineProps<{
     fieldName: string
-    inputValue: string | undefined
+    inputValue: string | number | undefined
   }>()
   const emits = defineEmits<{
     (e: 'updateField', val: string): void

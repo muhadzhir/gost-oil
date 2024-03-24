@@ -79,6 +79,7 @@ const rules = (config: FormItemConfig<ClientModel>) => {
   return rules
 }
 const addClientNumbers = () => {
+  //@ts-ignore
   const numsCount = Math.floor(client.value.currentPayment/1000)
   const firstNumber = Math.floor(Math.random() * 5000)
   const nums = []
@@ -89,9 +90,10 @@ const addClientNumbers = () => {
   router.push({ name: 'AddNumbersSuccess' })
 }
 const handlerChangeInput = (field: keyof ClientModel, val: string) => {
+  //@ts-ignore
   client.value[field] = val
 }
-const handlerSubmit = (formInstance: FormInstance) => {
+const handlerSubmit = (formInstance: FormInstance | undefined) => {
   if (!formInstance) return
   formInstance.validate((valid) => {
     if (valid) {
