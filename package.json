@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@types/node": "^20.11.28",
+    "element-plus": "^2.6.1",
     "libphonenumber-js": "^1.10.58",
     "maz-ui": "^3.36.0",
     "url": "^0.11.3",

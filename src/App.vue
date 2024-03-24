@@ -12,5 +12,7 @@
     background-color: #007Ac5;
     margin: 0;
     padding: 0;
+    font-family: "Arial";
+    color: white;
   }
 </style>
