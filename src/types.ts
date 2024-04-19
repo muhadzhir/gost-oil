@@ -29,3 +29,8 @@ export type FormItemConfig<T> = {
     disabled?: (val: T) => boolean
     label?: (val: T) => string
 }
+export type User = {
+    name: string
+    password: string
+    role: string
+}

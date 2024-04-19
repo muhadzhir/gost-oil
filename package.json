@@ -4,12 +4,16 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "serve": "vite",
+    "serve": "cross-env NODE_ENV=prod  vite",
+    "serve:dev": "cross-env NODE_ENV=dev vite",
+    "serve:local": "cross-env NODE_ENV=local vite",
     "build": "vue-tsc && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
     "@types/node": "^20.11.28",
+    "axios": "^1.6.8",
+    "cross-env": "^7.0.3",
     "element-plus": "^2.6.1",
     "libphonenumber-js": "^1.10.58",
     "maz-ui": "^3.36.0",

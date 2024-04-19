@@ -23,13 +23,14 @@
 </template>
 <script lang="ts" setup>
 import { onMounted } from "vue"
-import {numbers, client} from "@/store/clientsStore.ts"
+import {numbers, client, resetClient} from "@/store/clientsStore.ts"
 import router from "@/router.ts"
 
 const handlerDoneBtn = () => {
   goToLocationPage(2)
 }
 const goToLocationPage = (number: number) => {
+  resetClient()
   router.push({ name: 'Location', params: { number }})
 }
 onMounted(() => {

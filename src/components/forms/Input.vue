@@ -13,20 +13,35 @@
 </template>
 
 <script lang="ts" setup>
-  defineProps<{
+  const props = defineProps<{
     fieldName: string
     inputValue: string | number | undefined
+    limit?: number
+    mask?: 'number' | 'phone'
   }>()
   const emits = defineEmits<{
-    (e: 'updateField', val: string): void
+    (e: 'updateField', val: string | number): void
   }>()
+  const getValueWithMask = (val: string) => {
+    if (props.mask === 'number') {
+      let value = parseInt(val)
+      if (value < 0) return 0
+      if (props.limit) return value > props.limit ? props.limit : value
+      return value
+    }
+    return ''
+  }
   const handlerInput = (val: string) => {
-    emits('updateField', val)
+    let inputValue: string | number = val
+    if (val && props.mask) {
+      inputValue = getValueWithMask(val)
+    }
+    emits('updateField', inputValue)
   }
 </script>
 <style lang="scss">
   .input {
-    height: 40px;
+    height: 45px;
     border-radius: 10px;
     overflow: hidden;
     .el-input {
