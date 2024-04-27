@@ -3,16 +3,28 @@
       v-bind="$attrs"
       :prop="fieldName"
   >
-  <ElInput
-    :model-value="inputValue"
-    v-bind="$attrs"
-    class="input"
-    @input="handlerInput"
-  />
+    <MaskInput
+        v-if="mask"
+        v-model="value"
+        v-bind="$attrs"
+        class="input"
+        :mask="mask"
+        @keyup="($event: unknown) => handlerInput($event!.target!.value!)"
+    />
+    <ElInput
+        v-if="!mask"
+      :model-value="value"
+      v-bind="$attrs"
+      class="input"
+      @input="handlerInput"
+    />
   </el-form-item>
 </template>
 
 <script lang="ts" setup>
+
+  import {toRef} from "vue";
+
   const props = defineProps<{
     fieldName: string
     inputValue: string | number | undefined
@@ -22,26 +34,20 @@
   const emits = defineEmits<{
     (e: 'updateField', val: string | number): void
   }>()
-  const getValueWithMask = (val: string) => {
-    if (props.mask === 'number') {
-      let value = parseInt(val)
-      if (value < 0) return 0
-      if (props.limit) return value > props.limit ? props.limit : value
-      return value
-    }
-    return ''
-  }
+  const value = toRef(props.inputValue)
+
   const handlerInput = (val: string) => {
     let inputValue: string | number = val
-    if (val && props.mask) {
-      inputValue = getValueWithMask(val)
-    }
     emits('updateField', inputValue)
   }
 </script>
 <style lang="scss">
   .input {
-    height: 45px;
+    width: 100%;
+    font-size: 40px;
+    outline: none;
+    padding: 40px 20px;
+    height: 50px;
     border-radius: 10px;
     overflow: hidden;
     .el-input {

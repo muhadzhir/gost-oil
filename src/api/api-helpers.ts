@@ -1,12 +1,12 @@
 
 const getTocken = () => {
-  return ''
+  return localStorage.getItem('token')
 }
 const getHeaders = async () => {
   const token = getTocken()
   return {
     'Content-Type': 'application/json',
-    // Authorization: `Bearer ${token}`
+    Authorization: `Bearer ${token}`
   }
 }
 const request = async <TResponse>(url: string, config = {}): Promise<TResponse> => {

@@ -27,16 +27,22 @@ import {numbers, client, resetClient} from "@/store/clientsStore.ts"
 import router from "@/router.ts"
 
 const handlerDoneBtn = () => {
-  goToLocationPage(2)
+  goToLocationPage()
 }
-const goToLocationPage = (number: number) => {
+const goToLocationPage = () => {
   resetClient()
-  router.push({ name: 'Location', params: { number }})
+  router.push({ name: 'Client'})
+}
+const goToForm = () => {
+  if (!numbers.value.length) {
+    goToLocationPage()
+  }
+  setTimeout(() => {
+    goToLocationPage()
+  }, 10000)
 }
 onMounted(() => {
-  if (!numbers.value.length) {
-    goToLocationPage(2)
-  }
+  goToForm()
 })
 </script>
 <style lang="scss" scoped>

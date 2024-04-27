@@ -1,11 +1,11 @@
-import {StationEssence} from "@/types.ts";
+import {OilStation} from "@/types.ts";
 
 export interface Client {
     name?: string
     phone?: string
     currentPayment?: number
     totalPayment?: number
-    stationEssence: StationEssence
+    oilStation: OilStation
 }
 export class ClientModel {
     constructor(client: Client) {
@@ -13,11 +13,11 @@ export class ClientModel {
         this.phone = client.phone
         this.currentPayment = client.currentPayment
         this.totalPayment = client.totalPayment
-        this.stationEssence = client.stationEssence
+        this.oilStation = client.oilStation
     }
     name: Client['name']
     phone: Client['phone']
     totalPayment: Client['totalPayment']
     currentPayment: Client['currentPayment']
-    stationEssence: Client['stationEssence']
+    oilStation: Client['oilStation']
 }
