@@ -21,12 +21,12 @@ export interface Notification {
     onClose?: () => void
     title?: string
 }
-export type OilStation = 'ZARECHNYI' | 'GUTYAKULOVA' | 'OBYEZDNAYA'
+export type OilStation = 'ZARECHNY' | 'GUTYAKULOVA' | 'SHOSEINAYA'
 
 export type FormItemConfig<T> = {
     field: keyof T
     required?: (val: T) => boolean
-    validateRule?: (val: T) => void
+    validateRule?: Function
     disabled?: (val: T) => boolean
     label?: (val: T) => string
 }

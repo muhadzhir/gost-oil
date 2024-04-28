@@ -8,7 +8,7 @@ export const getUser = (): User => {
 }
 export const getUserProperty = <T>(key: keyof User): T => {
   const user = getUser()
-  return user[key]
+  return user[key] as T
 }
 
 export const  useTokenMixin = () => {

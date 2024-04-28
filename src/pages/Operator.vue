@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <div class="operator">
+    <div class="operator-title">{{ oilStationName }}</div>
     <MazTable size="sm" :headers="['#', 'Номер', 'Сумма', 'Время' ]">
       <MazTableRow v-for="(ticket, i) in tickets">
         <MazTableCell >
@@ -44,15 +45,16 @@
   </div>
 </template>
 <script lang="ts" setup>
-  import {onMounted, ref} from "vue"
+import {computed, onMounted, ref} from "vue"
   import {OilStation, TableRow, Ticket} from "@/types.ts";
   import { useSocket } from "@/mixins/socket-connect.ts";
   import { fetchAddTicket, fetchTicketsByOilStation } from "@/api/api.ts";
   import { getDateTimeFormat } from "@/mixins/date-mixins.ts";
   import { showNotification } from "@/components/notifications.ts";
   import { useTokenMixin} from "@/mixins/token.ts";
+  import { getOilRusName } from "@/utils";
 
-  const { getUserProperty } = useTokenMixin()
+const { getUserProperty } = useTokenMixin()
   const {socket} = useSocket()
   const dialogVisible = ref(false)
   const setDialogVisible = (isVisible: boolean) => {
@@ -104,6 +106,7 @@
     setDialogVisible(false)
     await updateTicketsByStation()
   }
+  const oilStationName = computed(() => ` Заправка: ${getOilRusName(getUserProperty<OilStation>('oilStation'))}`)
   const handlleClose = () => {
     socket.emit('addParticipantReject', {oilStation: getUserProperty('oilStation')})
     resetSum()
@@ -111,7 +114,11 @@
   const updateTicketsByStation = async () => {
     const oilTickets = await fetchTicketsByOilStation(getUserProperty<OilStation>('oilStation'))
     tickets.value = oilTickets.map((ticket: Ticket) => {
-      const cells = Object.entries(ticket).filter(([key]) => key in ticketConfig).map(([key, value]) => ({ value: ticketConfig[key]!.value(value)}))
+      const cells = Object.entries(ticket).filter(([key]) => key in ticketConfig).map(([key, value]) => {
+        const ticket = ticketConfig as any
+        const ticketKey = ticket[key] as any
+        return { value: ticketKey!.value(value) as any}
+      })
       return {
         cells
       }
@@ -124,12 +131,21 @@
   })
 </script>
 <style lang="scss">
-  .operator-dialog {
-    &-field {
+  .operator {
+    &-title {
+      margin-top: 20px;
       font-size: 20px;
-      margin-bottom: 20px;
+      display: flex;
+      justify-content: center;
+    }
+    &-dialog {
+      &-field {
+        font-size: 20px;
+        margin-bottom: 20px;
+      }
     }
   }
+
   .m-table {
     color: black;
     padding: 20px;

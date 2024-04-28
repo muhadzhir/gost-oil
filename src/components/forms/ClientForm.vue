@@ -14,7 +14,7 @@
             mask="+7 (###)-###-##-##"
             :rules="rules(clientConfig.find(({ field }) => field === 'phone')!)"
             placeholder="Телефон" class="form-input" field-name="phone"
-            @updateField="(val: string) => handlerChangeInput('phone', val)"
+            @updateField="(val: any) => handlerChangeInput('phone', val)"
         />
         <MazBtn class="form-button" :loading="loading" color="success" size="xl" @click="handlerSubmit(formRef)">
           Подтвердить
@@ -54,8 +54,8 @@ const clientConfig: FormItemConfig<ClientModel>[] = [
     field: 'phone',
     required: () => true,
     validateRule: (
-        model: unknown,
-        rule: unknown,
+        __: unknown,
+        _: unknown,
         value: string,
         cb: Function
     ) => {

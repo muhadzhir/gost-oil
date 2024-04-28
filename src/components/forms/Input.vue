@@ -9,7 +9,7 @@
         v-bind="$attrs"
         class="input"
         :mask="mask"
-        @keyup="($event: unknown) => handlerInput($event!.target!.value!)"
+        @keyup="($event: any) => handlerInput(`${$event!.target!.value!}`)"
     />
     <ElInput
         v-if="!mask"
@@ -29,7 +29,7 @@
     fieldName: string
     inputValue: string | number | undefined
     limit?: number
-    mask?: 'number' | 'phone'
+    mask?:  string
   }>()
   const emits = defineEmits<{
     (e: 'updateField', val: string | number): void
@@ -37,7 +37,7 @@
   const value = toRef(props.inputValue)
 
   const handlerInput = (val: string) => {
-    let inputValue: string | number = val
+    let inputValue: string = val
     emits('updateField', inputValue)
   }
 </script>

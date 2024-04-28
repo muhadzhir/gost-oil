@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "serve": "cross-env NODE_ENV=prod  vite",
+    "serve": "cross-env NODE_ENV=prod vite",
     "serve:dev": "cross-env NODE_ENV=dev vite",
     "serve:local": "cross-env NODE_ENV=local vite",
     "build": "vue-tsc && vite build",
