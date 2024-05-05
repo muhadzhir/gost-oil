@@ -1,25 +1,32 @@
 <template>
-  <div>
-    <MazFullscreenLoader v-if="ticketInProgress">
-      <p>
-        Обрабатывается...
-      </p>
-    </MazFullscreenLoader>
-    <div v-if="!ticketInProgress" class="form">
-      <el-form ref="formRef" label-position="top" require-asterisk-position="right" :disabled="loading" :model="client"
-               class="relative">
-        <span class="form-title"> Заполните данные </span>
-        <Input
-            :input-value="client.phone"
-            mask="+7 (###)-###-##-##"
-            :rules="rules(clientConfig.find(({ field }) => field === 'phone')!)"
-            placeholder="Телефон" class="form-input" field-name="phone"
-            @updateField="(val: any) => handlerChangeInput('phone', val)"
-        />
-        <MazBtn class="form-button" :loading="loading" color="success" size="xl" @click="handlerSubmit(formRef)">
-          Подтвердить
-        </MazBtn>
-      </el-form>
+  <div class="client">
+    <div v-if="isUserExist()"  class="client-form">
+      <MazFullscreenLoader v-if="ticketInProgress">
+        <p>
+          Обрабатывается...
+        </p>
+      </MazFullscreenLoader>
+      <div v-if="!ticketInProgress">
+        <el-form ref="formRef" label-position="top" require-asterisk-position="right" :disabled="loading" :model="client"
+                 class="relative">
+          <span class="client-title"> Заполните данные </span>
+          <Input
+              :input-value="client.phone"
+              mask="+7 (###)-###-##-##"
+              :rules="rules(clientConfig.find(({ field }) => field === 'phone')!)"
+              placeholder="Телефон" class="client-input" field-name="phone"
+              @updateField="(val: any) => handlerChangeInput('phone', val)"
+              @keyup.enter="handlerSubmit(formRef)"
+          />
+          <input style="display: none" />
+          <MazBtn class="client-button" :loading="loading" color="success" size="xl" @click="handlerSubmit(formRef)">
+            Подтвердить
+          </MazBtn>
+        </el-form>
+      </div>
+    </div>
+    <div v-else style="font-size: 40px">
+      Нужно подключить заправку
     </div>
   </div>
 
@@ -36,8 +43,9 @@ import { useSocket } from "@/mixins/socket-connect.ts";
 import { useTokenMixin } from "@/mixins/token.ts";
 import { setNumbers } from "@/store/clientsStore.ts";
 import router from "@/router.ts";
+
 const {socket} = useSocket()
-const { getUserProperty } = useTokenMixin()
+const { isUserExist, getUserProperty } = useTokenMixin()
 const ticketInProgress = ref(false)
 const oilStation = getUserProperty<OilStation>('oilStation')
 const setTicketInProgress = (inProgress: boolean) => {
@@ -116,7 +124,6 @@ const connectSocket = () => {
     }
   });
   socket.on('addParticipantReject', (data: { oilStation: OilStation }) => {
-    console.log(data)
     if (oilStation === data.oilStation) {
       setTicketInProgress(false)
     }
@@ -129,8 +136,11 @@ onMounted(() => {
 </script>
 
 <style lang="scss">
-.form {
-  padding: 0 200px;
+.client {
+  padding: 20px 150px 0 150px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 0 auto;
   & .m-btn {
     height: 45px;
   }
@@ -140,11 +150,8 @@ onMounted(() => {
     font-size: 20px;
     color: orange;
   }
-  padding-top: 20px;
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin: 0 auto;
+
+
 
   &-title {
     display: block;
@@ -153,10 +160,17 @@ onMounted(() => {
     text-align: center;
     margin-bottom: 20px;
   }
+  &-subtitle {
+    display: block;
+    font-size: 24px;
+    text-align: center;
+    margin-bottom: 10px;
+  }
 
   &-button {
     width: 100%;
     margin-top: 18px;
+    padding-top: 10px !important;
   }
 
   & .el-form {

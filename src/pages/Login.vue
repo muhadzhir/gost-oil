@@ -1,7 +1,7 @@
 <template>
   <div class="login">
-    <MazInput v-model="name" label="Логин" />
-    <MazInput v-model="password" label="Пароль" />
+    <MazInput style="margin-bottom: 20px" v-model="name" label="Логин" />
+    <MazInput style="margin-bottom: 10px" v-model="password" type="password" label="Пароль" />
     <MazBtn @click="handlerSubmitBtn">Войти</MazBtn>
   </div>
 </template>
@@ -30,10 +30,10 @@ const handlerSubmitBtn = async () => {
 </script>
 <style lang="scss" scoped>
 .login {
-  max-width: 768px;
-  margin: 0 auto;
-  display: grid;
+  max-width: 1024px;
+  min-width: 768px;
   gap: 10px;
+  margin: 0 auto;
   padding-top: 20px;
 }
 </style>

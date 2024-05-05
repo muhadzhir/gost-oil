@@ -46,7 +46,7 @@
     width: 100%;
     font-size: 40px;
     outline: none;
-    padding: 40px 20px;
+    padding: 0px 20px;
     height: 50px;
     border-radius: 10px;
     overflow: hidden;

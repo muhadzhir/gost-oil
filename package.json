@@ -27,6 +27,8 @@
     "vue-router": "^4.3.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.24.5",
+    "@babel/preset-env": "^7.24.5",
     "@types/sockjs-client": "^1.5.4",
     "@vitejs/plugin-vue": "^5.0.4",
     "sass": "^1.72.0",

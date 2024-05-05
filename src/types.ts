@@ -3,7 +3,7 @@ export type FormeRequestData = {
     status: FormeRequestStatus
     name: string
     phone: string
-    sum: number
+    numbersCount: number
     numbers?: number[]
 }
 export type NotificationType = 'warning' | 'error' | 'success' | 'info'
@@ -44,7 +44,7 @@ export type TableRow = {
 }
 export type Ticket = {
     phone: string
-    sum: number
+    numbersCount: number
     oilStation: OilStation
 }
 
@@ -52,4 +52,5 @@ export type ParticipantNumber = {
     phone: string
     id: number
     createdAt: string
+    oilStation: OilStation
 }

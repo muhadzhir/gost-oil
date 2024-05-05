@@ -10,4 +10,23 @@ export default defineConfig({
       '@': fileURLToPath(new URL('src', import.meta.url)),
     }
   },
+  build: {
+    target: 'es2015',
+    polyfillDynamicImport: false,
+    rollupOptions: {
+      output: {
+        manualChunks: undefined
+      }
+    },
+    babel: {
+      presets: [
+        ['@babel/preset-env', {
+          targets: {
+            browsers: ['last 2 versions', 'ie >= 11']
+          }
+        }]
+      ]
+    }
+  }
+
 })

@@ -1,8 +1,7 @@
 <template>
   <div class="operator">
-    <div class="operator-title">{{ oilStationName }}</div>
-    <MazTable size="sm" :headers="['#', 'Номер', 'Сумма', 'Время' ]">
-      <MazTableRow v-for="(ticket, i) in tickets">
+    <MazTable size="sm" :headers="['#', 'Номер', 'Телефон', 'Заправка', 'Время' ]">
+      <MazTableRow v-for="(ticket, i) in tableRows">
         <MazTableCell >
           {{ i + 1 }}
         </MazTableCell>
@@ -21,15 +20,17 @@
         :persistent="true"
         class="operator-dialog"
         title="Новая заявка"
-        @close="handlleClose"
+        @close="handleClose"
     >
       <div class="operator-dialog-field">
         Телефон {{ currentPhone }}
       </div>
       <MazInputNumber
-          v-model="sum"
+          v-model="numbersCount"
           placeholder="Сумма"
-          :max="10000"
+          :max="10"
+          :min="1"
+          :step="1"
           color="secondary"
           style="min-width: 200px"
       />
@@ -45,16 +46,17 @@
   </div>
 </template>
 <script lang="ts" setup>
-import {computed, onMounted, ref} from "vue"
-  import {OilStation, TableRow, Ticket} from "@/types.ts";
+  import { onMounted, ref} from "vue"
+  import {OilStation, TableRow, ParticipantNumber} from "@/types.ts";
   import { useSocket } from "@/mixins/socket-connect.ts";
-  import { fetchAddTicket, fetchTicketsByOilStation } from "@/api/api.ts";
+  import { fetchAddTicket, fetchAllNumbers } from "@/api/api.ts";
   import { getDateTimeFormat } from "@/mixins/date-mixins.ts";
   import { showNotification } from "@/components/notifications.ts";
   import { useTokenMixin} from "@/mixins/token.ts";
-  import { getOilRusName } from "@/utils";
-
-const { getUserProperty } = useTokenMixin()
+  import { useBaseMixin } from "@/mixins/base-mixin.ts";
+  import {getOilRusName} from "@/utils";
+  const { loading, setLoading } = useBaseMixin()
+  const { getUserProperty } = useTokenMixin()
   const {socket} = useSocket()
   const dialogVisible = ref(false)
   const setDialogVisible = (isVisible: boolean) => {
@@ -62,20 +64,26 @@ const { getUserProperty } = useTokenMixin()
   }
   const currentPhone = ref('')
 
-  const sum = ref<number>(1000)
-  const setSum = (sumValue: number) => {
-    sum.value = sumValue
+  const numbersCount = ref<number>(1)
+  const setSum = (count: number) => {
+    numbersCount.value = count
   }
   const resetSum = () => {
-    setSum(1000)
+    setSum(1)
   }
-  const tickets = ref<TableRow[]>([])
-  const ticketConfig = {
+  const tableRows = ref<TableRow[]>([])
+  const rowConfig = {
+    id: {
+      value: (val: string) => val
+    },
     phone: {
       value: (val: string) => val
     },
-    sum: {
+    numbersCount: {
       value: (val: string) => val
+    },
+    oilStation: {
+      value: (val: OilStation) => getOilRusName(val)
     },
     createdAt: {
       value: (val: string) => getDateTimeFormat(val)
@@ -92,31 +100,34 @@ const { getUserProperty } = useTokenMixin()
     });
   }
   const handlerConfirm = async () => {
-    if (sum.value < 1000) {
-      showNotification('Сумма должна быть не меньше 1000руб')
+    if (numbersCount.value < 1) {
+      showNotification('')
       return
     }
-    const oilStation = getUserProperty<OilStation>('oilStation')
+    if (loading.value) return
+    setLoading(true)
+    const oilStation = getUserProperty<OilStation>('oilStation')!
     const {numbers} = await fetchAddTicket({
       phone: currentPhone.value,
-      sum: +sum.value,
+      numbersCount: +numbersCount.value,
       oilStation
     })
     socket.emit('addParticipant', { numbers, oilStation })
     setDialogVisible(false)
-    await updateTicketsByStation()
+    await getNumbers()
+    setLoading(false)
   }
-  const oilStationName = computed(() => ` Заправка: ${getOilRusName(getUserProperty<OilStation>('oilStation'))}`)
-  const handlleClose = () => {
+
+  const handleClose = () => {
     socket.emit('addParticipantReject', {oilStation: getUserProperty('oilStation')})
     resetSum()
   }
-  const updateTicketsByStation = async () => {
-    const oilTickets = await fetchTicketsByOilStation(getUserProperty<OilStation>('oilStation'))
-    tickets.value = oilTickets.map((ticket: Ticket) => {
-      const cells = Object.entries(ticket).filter(([key]) => key in ticketConfig).map(([key, value]) => {
-        const ticket = ticketConfig as any
-        const ticketKey = ticket[key] as any
+  const getNumbers = async () => {
+    const numbers = await fetchAllNumbers()
+    tableRows.value = numbers.map((num: ParticipantNumber) => {
+      const cells = Object.entries(num).filter(([key]) => key in rowConfig).map(([key, value]) => {
+        const row = rowConfig as any
+        const ticketKey = row[key] as any
         return { value: ticketKey!.value(value) as any}
       })
       return {
@@ -127,7 +138,7 @@ const { getUserProperty } = useTokenMixin()
   }
   onMounted(async () => {
     startWebSocketConnect()
-    updateTicketsByStation()
+    getNumbers()
   })
 </script>
 <style lang="scss">

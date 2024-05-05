@@ -18,6 +18,12 @@ export default [
       import(/* webpackChunkName: "Examples" */ './pages/CheckNumbers.vue'),
   },
   {
+    path: '/test',
+    name: 'CheckNumbers',
+    component: () =>
+      import(/* webpackChunkName: "Examples" */ './pages/Test.vue'),
+  },
+  {
     path: '/locations/operator',
     name: 'Operator',
     component: () =>

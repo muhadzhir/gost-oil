@@ -22,7 +22,9 @@ export const fetchAddTicket = (params: Ticket) => {
 export const fetchNumbers = (phone: string) => {
   return API_POST<ParticipantNumber[]>(`${mainUrl}/numbers/get-numbers`, { phone })
 }
-
+export const fetchAllNumbers = () => {
+  return API_GET<ParticipantNumber[]>(`${mainUrl}/numbers/get-all-numbers`)
+}
 export const fetchTicketsByOilStation = (oilStation: OilStation) => {
   return API_GET<Ticket[]>(`${mainUrl}/tickets/get-tickets/${oilStation}`)
 }
