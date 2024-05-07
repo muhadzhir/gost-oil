@@ -5,6 +5,7 @@
         <p>
           Обрабатывается...
         </p>
+        <MazBtn @click="handlerTicketCancel">Отменить</MazBtn>
       </MazFullscreenLoader>
       <div v-if="!ticketInProgress">
         <el-form ref="formRef" label-position="top" require-asterisk-position="right" :disabled="loading" :model="client"
@@ -40,6 +41,7 @@ import Input from '@/components/forms/Input.vue'
 import {client} from "@/store/clientsStore.ts"
 import type { FormInstance } from 'element-plus'
 import { useSocket } from "@/mixins/socket-connect.ts";
+import { initOilStation, currentOilStation} from "@/store/oilStationStore.ts";
 import { useTokenMixin } from "@/mixins/token.ts";
 import { setNumbers } from "@/store/clientsStore.ts";
 import router from "@/router.ts";
@@ -47,9 +49,12 @@ import router from "@/router.ts";
 const {socket} = useSocket()
 const { isUserExist, getUserProperty } = useTokenMixin()
 const ticketInProgress = ref(false)
-const oilStation = getUserProperty<OilStation>('oilStation')
+
 const setTicketInProgress = (inProgress: boolean) => {
   ticketInProgress.value = inProgress
+}
+const handlerTicketCancel = () => {
+  socket.emit('addParticipantReject', {oilStation: currentOilStation.value})
 }
 const emits = defineEmits<{
   (e: 'submitted', requestData: FormeRequestData): void
@@ -113,25 +118,27 @@ const handlerSubmit = (formInstance: FormInstance | undefined) => {
   })
 }
 const handlerSuccess = () => {
-  socket.emit('newTicket', { phone: client.value.phone, oilStation })
+  socket.emit('newTicket', { phone: client.value.phone, oilStation: currentOilStation.value})
   setTicketInProgress(true)
 }
 const connectSocket = () => {
   socket.on('addParticipant', (data: { oilStation: OilStation, numbers: number[]}) => {
-    if (oilStation === data.oilStation) {
+    if (currentOilStation.value === data.oilStation) {
       setNumbers(data.numbers)
       router.push({ name: 'AddNumbersSuccess' })
     }
   });
   socket.on('addParticipantReject', (data: { oilStation: OilStation }) => {
-    if (oilStation === data.oilStation) {
+    if (currentOilStation.value === data.oilStation) {
       setTicketInProgress(false)
     }
   });
 }
 
 onMounted(() => {
+  initOilStation()
   connectSocket()
+
 })
 </script>
 

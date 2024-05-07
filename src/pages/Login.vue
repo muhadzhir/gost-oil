@@ -10,6 +10,7 @@ import { ref } from "vue";
 import { fetchLogin } from "@/api/api.ts";
 import { jwtDecode } from "jwt-decode";
 import router from '@/router'
+import { setOilStation } from "@/store/oilStationStore.ts";
 
 const name = ref('')
 const password = ref('')
@@ -20,6 +21,7 @@ const handlerSubmitBtn = async () => {
   })
   const user = jwtDecode(token) as any
   localStorage.setItem('token', token)
+  setOilStation(user.oilStation)
   if (user.role === 'CLIENT') {
     router.push({ name: 'Client', params: { oilStation: user.oilStation } })
   }

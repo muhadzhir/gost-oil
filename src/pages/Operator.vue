@@ -1,15 +1,38 @@
 <template>
   <div class="operator">
-    <MazTable size="sm" :headers="['#', 'Номер', 'Телефон', 'Заправка', 'Время' ]">
-      <MazTableRow v-for="(ticket, i) in tableRows">
-        <MazTableCell >
-          {{ i + 1 }}
-        </MazTableCell>
-        <MazTableCell v-for="cell in ticket.cells">
-          {{ cell.value }}
-        </MazTableCell>
+    <MazTable
+        v-model:page="page"
+        v-model:page-size="pageSize"
+        v-model:search-query="searchQuery"
+        searchPlaceholder="Поиск"
+        noSearchBy
+        search
+        sortable
+        hoverable
+        background-even
+        pagination
+        size="sm"
+        :headers="[
+          {
+           label: 'Номер',
+           key: 'id',
+          },
+          {
+           label: 'Телефон',
+           key: 'phone',
+          },
+          {
+           label: 'Заправка',
+           key: 'oilStation',
+          },
+          {
+           label: 'Время',
+           key: 'createdAt',
+          },
+        ]"
+        :rows="tableRows"
+    >
 
-      </MazTableRow>
       <template #no-results-text>
         Нет данных
       </template>
@@ -47,23 +70,27 @@
 </template>
 <script lang="ts" setup>
   import { onMounted, ref} from "vue"
-  import {OilStation, TableRow, ParticipantNumber} from "@/types.ts";
+  import {OilStation, ParticipantNumber} from "@/types.ts";
   import { useSocket } from "@/mixins/socket-connect.ts";
   import { fetchAddTicket, fetchAllNumbers } from "@/api/api.ts";
   import { getDateTimeFormat } from "@/mixins/date-mixins.ts";
   import { showNotification } from "@/components/notifications.ts";
-  import { useTokenMixin} from "@/mixins/token.ts";
   import { useBaseMixin } from "@/mixins/base-mixin.ts";
   import {getOilRusName} from "@/utils";
+  import {initOilStation, currentOilStation} from "@/store/oilStationStore.ts";
   const { loading, setLoading } = useBaseMixin()
-  const { getUserProperty } = useTokenMixin()
   const {socket} = useSocket()
   const dialogVisible = ref(false)
   const setDialogVisible = (isVisible: boolean) => {
     dialogVisible.value = isVisible
   }
   const currentPhone = ref('')
-
+  const setCurrentPhone = (phone: string) => {
+    currentPhone.value = phone
+  }
+  const page = ref(1)
+  const searchQuery = ref()
+  const pageSize = ref(10)
   const numbersCount = ref<number>(1)
   const setSum = (count: number) => {
     numbersCount.value = count
@@ -71,31 +98,23 @@
   const resetSum = () => {
     setSum(1)
   }
-  const tableRows = ref<TableRow[]>([])
-  const rowConfig = {
-    id: {
-      value: (val: string) => val
-    },
-    phone: {
-      value: (val: string) => val
-    },
-    numbersCount: {
-      value: (val: string) => val
-    },
-    oilStation: {
-      value: (val: OilStation) => getOilRusName(val)
-    },
-    createdAt: {
-      value: (val: string) => getDateTimeFormat(val)
-    },
+  const tableRows = ref<ParticipantNumber[]>([])
+
+  const replacePaginationToRus = () => {
+    const pagination = document.querySelector('.m-table-footer-pagination-items-per-page .maz-text-sm ')!
+    pagination.innerHTML = 'Кол-во элементов на странице'
   }
-
-
   const startWebSocketConnect = () => {
     socket.on('newTicketClient', ({phone, oilStation }: { phone: string, oilStation: OilStation}) => {
-      if(getUserProperty<OilStation>('oilStation') === oilStation) {
-        currentPhone.value = phone
+      if(currentOilStation.value === oilStation) {
+        setCurrentPhone(phone)
         setDialogVisible(true)
+      }
+    });
+    socket.on('addParticipantReject', (data: { oilStation: OilStation }) => {
+      if (currentOilStation.value === data.oilStation) {
+        setCurrentPhone('')
+        setDialogVisible(false)
       }
     });
   }
@@ -106,39 +125,37 @@
     }
     if (loading.value) return
     setLoading(true)
-    const oilStation = getUserProperty<OilStation>('oilStation')!
     const {numbers} = await fetchAddTicket({
       phone: currentPhone.value,
       numbersCount: +numbersCount.value,
-      oilStation
+      oilStation: currentOilStation.value!
     })
-    socket.emit('addParticipant', { numbers, oilStation })
+    socket.emit('addParticipant', { numbers, oilStation: currentOilStation.value })
     setDialogVisible(false)
     await getNumbers()
     setLoading(false)
   }
 
   const handleClose = () => {
-    socket.emit('addParticipantReject', {oilStation: getUserProperty('oilStation')})
+    socket.emit('addParticipantReject', {oilStation: currentOilStation.value})
     resetSum()
   }
   const getNumbers = async () => {
     const numbers = await fetchAllNumbers()
-    tableRows.value = numbers.map((num: ParticipantNumber) => {
-      const cells = Object.entries(num).filter(([key]) => key in rowConfig).map(([key, value]) => {
-        const row = rowConfig as any
-        const ticketKey = row[key] as any
-        return { value: ticketKey!.value(value) as any}
-      })
+    //@ts-ignore
+    tableRows.value = numbers.map(num => {
       return {
-        cells
+        ...num,
+        oilStation: getOilRusName(num.oilStation),
+        createdAt: getDateTimeFormat(num.createdAt)
       }
-    })
-
+    }).reverse()
   }
   onMounted(async () => {
+    initOilStation()
     startWebSocketConnect()
     getNumbers()
+    replacePaginationToRus()
   })
 </script>
 <style lang="scss">

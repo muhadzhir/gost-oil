@@ -5,13 +5,12 @@
 </template>
 <script setup lang="ts">
 
-import {useOilStationMixin} from "@/mixins/oil-station-mixins.ts";
-import {computed} from "vue";
-
-const { getOilRusNameByUser } = useOilStationMixin()
-const oilStationName = computed(() => {
-  const rusOilStation = getOilRusNameByUser()
-  return rusOilStation ? `Заправка: ${rusOilStation}` : ''
+import {oilStationRussName, initOilStation} from "@/store/oilStationStore.ts";
+import { computed } from "vue";
+import {onMounted} from "vue";
+const oilStationName = computed(() => `Заправка: ${oilStationRussName.value ?? 'Не определена'}`)
+onMounted(() => {
+  initOilStation()
 })
 </script>
 <style lang="scss" scoped>

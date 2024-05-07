@@ -36,12 +36,7 @@ export type User = {
     role: string
     oilStation: OilStation
 }
-type TableCell= {
-    value: string | number
-}
-export type TableRow = {
-    cells: TableCell[]
-}
+
 export type Ticket = {
     phone: string
     numbersCount: number
