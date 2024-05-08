@@ -19,7 +19,7 @@
               @updateField="(val: any) => handlerChangeInput('phone', val)"
               @keyup.enter="handlerSubmit(formRef)"
           />
-          <input style="display: none" />
+          <input field-name="test" input-value="test" style="display: none" />
           <MazBtn class="client-button" :loading="loading" color="success" size="xl" @click="handlerSubmit(formRef)">
             Подтвердить
           </MazBtn>
@@ -47,7 +47,7 @@ import { setNumbers } from "@/store/clientsStore.ts";
 import router from "@/router.ts";
 
 const {socket} = useSocket()
-const { isUserExist, getUserProperty } = useTokenMixin()
+const { isUserExist } = useTokenMixin()
 const ticketInProgress = ref(false)
 
 const setTicketInProgress = (inProgress: boolean) => {

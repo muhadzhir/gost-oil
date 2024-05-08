@@ -12,8 +12,7 @@ export const getUsers = () => {
   return API_GET<User[]>(`${mainUrl}/users`)
 }
 export const fetchLogin = (params: LoginParams) => {
-  console.log('fetchLogin', `${mainUrl}/auth/login`, params)
-  return API_POST<{token: string}>(`${mainUrl}/auth/login`, params)
+  return API_POST<{token: string} | { message: string }>(`${mainUrl}/auth/login`, params)
 }
 
 export const fetchAddTicket = (params: Ticket) => {
