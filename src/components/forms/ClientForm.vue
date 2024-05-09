@@ -1,6 +1,6 @@
 <template>
   <div class="client">
-    <div v-if="isUserExist()"  class="client-form">
+    <div v-if="isClient"  class="client-form">
       <MazFullscreenLoader v-if="ticketInProgress">
         <p>
           Обрабатывается...
@@ -20,22 +20,28 @@
               @keyup.enter="handlerSubmit(formRef)"
           />
           <input field-name="test" input-value="test" style="display: none" />
+          <MazCheckbox
+              v-model="personalDataConsent"
+              :value="personalDataConsent"
+              class="check-numbers-privacy"
+              :class="{'client-form-privacy_danger': warningVisible}"
+              @change="handlerChangePersonal"
+          >
+            Согласен с обработкой персональных данных
+          </MazCheckbox>
           <MazBtn class="client-button" :loading="loading" color="success" size="xl" @click="handlerSubmit(formRef)">
             Подтвердить
           </MazBtn>
         </el-form>
       </div>
     </div>
-    <div v-else style="font-size: 40px">
-      Нужно подключить заправку
-    </div>
   </div>
 
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import {FormeRequestData, FormItemConfig, OilStation} from "@/types.ts"
+import {ref, onMounted, computed} from 'vue'
+import {FormeRequestData, OilStation} from "@/types.ts"
 import { ClientModel } from '@/models/ClientModel.ts'
 import Input from '@/components/forms/Input.vue'
 import {client} from "@/store/clientsStore.ts"
@@ -43,64 +49,39 @@ import type { FormInstance } from 'element-plus'
 import { useSocket } from "@/mixins/socket-connect.ts";
 import { initOilStation, currentOilStation} from "@/store/oilStationStore.ts";
 import { useTokenMixin } from "@/mixins/token.ts";
+import { rules } from '@/utils'
+import { clientConfig } from "@/fields/client-fields.ts";
 import { setNumbers } from "@/store/clientsStore.ts";
 import router from "@/router.ts";
 
 const {socket} = useSocket()
-const { isUserExist } = useTokenMixin()
+const { isClient } = useTokenMixin()
 const ticketInProgress = ref(false)
+const personalDataConsent = ref(true)
+
+const formSubmitted = ref(false)
+const setFormSubmitted = (_formSubmitted: boolean) => {
+  formSubmitted.value = _formSubmitted
+}
+
+const warningVisible = computed(() => !personalDataConsent.value && formSubmitted.value)
 
 const setTicketInProgress = (inProgress: boolean) => {
   ticketInProgress.value = inProgress
 }
-const handlerTicketCancel = () => {
-  socket.emit('addParticipantReject', {oilStation: currentOilStation.value})
-}
+
 const emits = defineEmits<{
   (e: 'submitted', requestData: FormeRequestData): void
 }>()
 
 const formRef = ref<FormInstance>()
 const loading = ref(false)
-const clientConfig: FormItemConfig<ClientModel>[] = [
-  {
-    field: 'phone',
-    required: () => true,
-    validateRule: (
-        __: unknown,
-        _: unknown,
-        value: string,
-        cb: Function
-    ) => {
-      if (value.length < 18) {
-        cb(
-            new Error(
-                `Телефон заполнен не до конца`
-            )
-        )
-      }
-      cb()
-    }
-  }
-]
 
-const rules = (config: FormItemConfig<ClientModel>) => {
-  const rules = []
-  if (config.required) {
-    const required = config.required(client.value)
-    rules.push({
-      required,
-      trigger: 'change',
-      message: `обязательно`
-    })
-  }
-  if (config.validateRule) {
-    rules.push({
-      validator: config.validateRule.bind(this, client.value),
-      trigger: 'change'
-    })
-  }
-  return rules
+const handlerTicketCancel = () => {
+  socket.emit('addParticipantReject', {oilStation: currentOilStation.value})
+}
+const handlerChangePersonal = () => {
+  setFormSubmitted(false)
 }
 const handlerChangeInput = (field: keyof ClientModel, val: string) => {
   //@ts-ignore
@@ -108,14 +89,14 @@ const handlerChangeInput = (field: keyof ClientModel, val: string) => {
 }
 
 const handlerSubmit = (formInstance: FormInstance | undefined) => {
-  if (!formInstance) return
+  setFormSubmitted(true)
+  if (!formInstance || !personalDataConsent.value) return
   formInstance.validate(async (valid) => {
     if (valid) {
       handlerSuccess()
-    } else {
-      return false
     }
   })
+  setFormSubmitted(false)
 }
 const handlerSuccess = () => {
   socket.emit('newTicket', { phone: client.value.phone, oilStation: currentOilStation.value})
@@ -129,6 +110,7 @@ const connectSocket = () => {
     }
   });
   socket.on('addParticipantReject', (data: { oilStation: OilStation }) => {
+    console.log('addParticipantReject')
     if (currentOilStation.value === data.oilStation) {
       setTicketInProgress(false)
     }
@@ -144,6 +126,16 @@ onMounted(() => {
 
 <style lang="scss">
 .client {
+  &-form {
+    &-privacy {
+      margin-bottom: 10px;
+      font-size: 14px ;
+      &_danger {
+        color: #FF4545;
+      }
+    }
+  }
+  overflow: hidden;
   padding: 20px 150px 0 150px;
   justify-content: center;
   flex-wrap: wrap;
@@ -183,6 +175,9 @@ onMounted(() => {
   & .el-form {
     width: 100%;
     padding: 0 20px;
+  }
+  &-input {
+     font-size: 40px;
   }
 }
 </style>

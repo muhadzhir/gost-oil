@@ -1,5 +1,5 @@
 <template>
-  <div class="operator">
+  <div v-if="isOperator" class="operator">
     <MazTable
         v-model:page="page"
         v-model:page-size="pageSize"
@@ -69,8 +69,8 @@
   </div>
 </template>
 <script lang="ts" setup>
-  import { onMounted, ref} from "vue"
-  import {OilStation, ParticipantNumber} from "@/types.ts";
+import { onMounted, ref} from "vue"
+import {OilStation, ParticipantNumber } from "@/types.ts";
   import { useSocket } from "@/mixins/socket-connect.ts";
   import { fetchAddTicket, fetchAllNumbers } from "@/api/api.ts";
   import { getDateTimeFormat } from "@/mixins/date-mixins.ts";
@@ -78,7 +78,9 @@
   import { useBaseMixin } from "@/mixins/base-mixin.ts";
   import {getOilRusName} from "@/utils";
   import {initOilStation, currentOilStation} from "@/store/oilStationStore.ts";
+import {useTokenMixin} from "@/mixins/token.ts";
   const { loading, setLoading } = useBaseMixin()
+const { isOperator } = useTokenMixin()
   const {socket} = useSocket()
   const dialogVisible = ref(false)
   const setDialogVisible = (isVisible: boolean) => {
@@ -101,8 +103,8 @@
   const tableRows = ref<ParticipantNumber[]>([])
 
   const replacePaginationToRus = () => {
-    const pagination = document.querySelector('.m-table-footer-pagination-items-per-page .maz-text-sm ')!
-    pagination.innerHTML = 'Кол-во элементов на странице'
+    const pagination = document.querySelector('.m-table-footer-pagination-items-per-page .maz-text-sm ')
+    if (pagination) pagination.innerHTML = 'Кол-во элементов на странице'
   }
   const startWebSocketConnect = () => {
     socket.on('newTicketClient', ({phone, oilStation }: { phone: string, oilStation: OilStation}) => {
@@ -154,8 +156,9 @@
   onMounted(async () => {
     initOilStation()
     startWebSocketConnect()
-    getNumbers()
+    await getNumbers()
     replacePaginationToRus()
+    console.log(isOperator.value)
   })
 </script>
 <style lang="scss">

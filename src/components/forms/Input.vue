@@ -44,7 +44,7 @@
 <style lang="scss">
   .input {
     width: 100%;
-    font-size: 40px;
+    font-size: 20px;
     outline: none;
     padding: 0px 20px;
     height: 50px;

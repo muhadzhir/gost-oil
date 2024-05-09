@@ -13,6 +13,7 @@
   import Footer from "@/components/Footer.vue";
 </script>
 <style lang="scss">
+  @import "css/index.css";
   body {
     background-color: #007Ac5;
     margin: 0;
@@ -23,7 +24,6 @@
   .app {
     height: 100vh;
     display: grid;
-    overflow: hidden;
     grid-template-rows: 0.1fr 10fr 1fr;
   }
 </style>

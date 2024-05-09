@@ -1,5 +1,5 @@
 import { io } from 'socket.io-client'
-const socket = io('https://muhadzhir-gost-oil-server-4054.twc1.net');
+const socket = io(import.meta.env.VITE_APP_API_MAIN);
 export const useSocket = () => {
   return {
     socket

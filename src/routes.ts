@@ -12,16 +12,10 @@ export default [
       import(/* webpackChunkName: "Examples" */ './pages/Client.vue'),
   },
   {
-    path: '/locations/check-numbers',
+    path: '/check-numbers',
     name: 'CheckNumbers',
     component: () =>
       import(/* webpackChunkName: "Examples" */ './pages/CheckNumbers.vue'),
-  },
-  {
-    path: '/test',
-    name: 'CheckNumbers',
-    component: () =>
-      import(/* webpackChunkName: "Examples" */ './pages/Test.vue'),
   },
   {
     path: '/locations/operator',

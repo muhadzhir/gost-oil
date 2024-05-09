@@ -8,12 +8,7 @@ export type FormeRequestData = {
 }
 export type NotificationType = 'warning' | 'error' | 'success' | 'info'
 export type NotificationPosition = 'top-left' | 'bottom-right' | 'bottom-left' | 'top-right'
-export interface NotificationParams {
-    message: string
-    type?: NotificationType
-    title?: string
-    position?: NotificationPosition
-}
+
 export interface Notification {
     type: NotificationType
     message: string
@@ -22,7 +17,7 @@ export interface Notification {
     title?: string
 }
 export type OilStation = 'ZARECHNY' | 'GUTYAKULOVA' | 'SHOSEINAYA'
-
+export type UserRole = 'CLIENT' | 'OPERATOR'
 export type FormItemConfig<T> = {
     field: keyof T
     required?: (val: T) => boolean
@@ -33,7 +28,7 @@ export type FormItemConfig<T> = {
 export type User = {
     name: string
     password: string
-    role: string
+    role: UserRole
     oilStation: OilStation
 }
 
