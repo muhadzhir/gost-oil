@@ -2,12 +2,16 @@ import dayjs from 'dayjs'
 import 'dayjs/locale/ru'
 dayjs.locale('ru')
 
-export const getDateFormat = (time: string, format = 'YYYY.MM.DD') => {
+type DateType = Date | string
+const getDateFormat = (time: DateType, format = 'DD.MM.YYYY') => {
   return dayjs(time).format(format)
 }
-export const getDateTimeFormat = (
-  time: string,
+const getDateTimeFormat = (
+  time: DateType,
   format = 'DD.MM.YYYY HH:mm'
 ) => {
   return dayjs(time).format(format)
+}
+export const useDateMixin = () => {
+  return { getDateFormat, getDateTimeFormat }
 }

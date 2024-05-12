@@ -24,6 +24,6 @@ export const fetchNumbers = (phone: string) => {
 export const fetchAllNumbers = () => {
   return API_GET<ParticipantNumber[]>(`${mainUrl}/numbers/get-all-numbers`)
 }
-export const fetchTicketsByOilStation = (oilStation: OilStation) => {
-  return API_GET<Ticket[]>(`${mainUrl}/tickets/get-tickets/${oilStation}`)
+export const fetchDownloadNumbers = () => {
+  return API_GET<ArrayBuffer>(`${mainUrl}/download/all-data`, {}, true)
 }

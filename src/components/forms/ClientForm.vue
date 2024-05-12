@@ -110,7 +110,6 @@ const connectSocket = () => {
     }
   });
   socket.on('addParticipantReject', (data: { oilStation: OilStation }) => {
-    console.log('addParticipantReject')
     if (currentOilStation.value === data.oilStation) {
       setTicketInProgress(false)
     }

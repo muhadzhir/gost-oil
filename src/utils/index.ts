@@ -28,3 +28,17 @@ export const rules = (config: FormItemConfig<ClientModel>) => {
   }
   return rules
 }
+export const createLinkFile = (file: ArrayBuffer, name = 'attachment') => {
+  const url = window.URL.createObjectURL(
+    new Blob([file], { type: 'application/octet-stream' })
+  )
+  downloadFile(url, name)
+}
+export const downloadFile = (url: string, nameFile = 'attachment') => {
+  const link = document.createElement('a')
+  link.href = url
+  link.setAttribute('download', nameFile)
+  document.body.append(link)
+  link.click()
+  link.remove()
+}

@@ -37,6 +37,7 @@
         Нет данных
       </template>
     </MazTable>
+    <MazBtn style="margin-left: 20px" @click="handlerClickDownloadBtn" >Скачать отчёт</MazBtn>
     <MazDialog
         v-model="dialogVisible"
         :no-close="true"
@@ -72,15 +73,17 @@
 import { onMounted, ref} from "vue"
 import {OilStation, ParticipantNumber } from "@/types.ts";
   import { useSocket } from "@/mixins/socket-connect.ts";
-  import { fetchAddTicket, fetchAllNumbers } from "@/api/api.ts";
-  import { getDateTimeFormat } from "@/mixins/date-mixins.ts";
+  import {fetchAddTicket, fetchAllNumbers, fetchDownloadNumbers} from "@/api/api.ts";
+  import { useDateMixin } from "@/mixins/date-mixins.ts";
   import { showNotification } from "@/components/notifications.ts";
   import { useBaseMixin } from "@/mixins/base-mixin.ts";
-  import {getOilRusName} from "@/utils";
+  import {createLinkFile, getOilRusName} from "@/utils";
   import {initOilStation, currentOilStation} from "@/store/oilStationStore.ts";
-import {useTokenMixin} from "@/mixins/token.ts";
+  import {useTokenMixin} from "@/mixins/token.ts";
+
+  const { getDateFormat, getDateTimeFormat } = useDateMixin()
   const { loading, setLoading } = useBaseMixin()
-const { isOperator } = useTokenMixin()
+  const { isOperator } = useTokenMixin()
   const {socket} = useSocket()
   const dialogVisible = ref(false)
   const setDialogVisible = (isVisible: boolean) => {
@@ -142,6 +145,10 @@ const { isOperator } = useTokenMixin()
     socket.emit('addParticipantReject', {oilStation: currentOilStation.value})
     resetSum()
   }
+  const handlerClickDownloadBtn = async () => {
+    const data = await fetchDownloadNumbers()
+    createLinkFile(data, `Номерки на ${getDateFormat(new Date())}.xlsx`)
+  }
   const getNumbers = async () => {
     const numbers = await fetchAllNumbers()
     //@ts-ignore
@@ -158,7 +165,6 @@ const { isOperator } = useTokenMixin()
     startWebSocketConnect()
     await getNumbers()
     replacePaginationToRus()
-    console.log(isOperator.value)
   })
 </script>
 <style lang="scss">
