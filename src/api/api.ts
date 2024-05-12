@@ -1,5 +1,5 @@
-import {API_GET, API_POST} from "@/api/api-helpers.ts";
-import {OilStation, ParticipantNumber, Ticket, User} from "@/types.ts";
+import { API_GET, API_POST } from "@/api/api-helpers.ts";
+import { ParticipantNumber, Ticket, User } from "@/types.ts";
 
 const mainUrl = `${import.meta.env.VITE_APP_API_MAIN}`
 type LoginParams = {
@@ -12,7 +12,7 @@ export const getUsers = () => {
   return API_GET<User[]>(`${mainUrl}/users`)
 }
 export const fetchLogin = (params: LoginParams) => {
-  return API_POST<{token: string} | { message: string }>(`${mainUrl}/auth/login`, params)
+  return API_POST<{ token: string } | { message: string }>(`${mainUrl}/auth/login`, params)
 }
 
 export const fetchAddTicket = (params: Ticket) => {
