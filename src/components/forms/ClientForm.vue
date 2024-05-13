@@ -29,9 +29,15 @@
           >
             Согласен с обработкой персональных данных
           </MazCheckbox>
-          <MazBtn class="client-button" :loading="loading" color="success" size="xl" @click="handlerSubmit(formRef)">
-            Подтвердить
-          </MazBtn>
+          <div class="client-button-wrapper">
+            <MazBtn class="client-button" :loading="loading" color="success" size="xl" @click="handlerSubmit(formRef)">
+              Подтвердить
+            </MazBtn>
+            <MazBtn class="client-button" @click="handlerClickReloadIcon" :loading="loading" size="xl" >
+              <el-icon><RefreshLeft /></el-icon>
+            </MazBtn>
+          </div>
+
         </el-form>
       </div>
     </div>
@@ -102,6 +108,9 @@ const handlerSuccess = () => {
   socket.emit('newTicket', { phone: client.value.phone, oilStation: currentOilStation.value})
   setTicketInProgress(true)
 }
+const handlerClickReloadIcon = () => {
+  location.reload()
+}
 const connectSocket = () => {
   socket.on('addParticipant', (data: { oilStation: OilStation, numbers: number[]}) => {
     if (currentOilStation.value === data.oilStation) {
@@ -167,8 +176,12 @@ onMounted(() => {
 
   &-button {
     width: 100%;
-    margin-top: 18px;
-    padding-top: 10px !important;
+    &-wrapper {
+      display: grid;
+      margin-top: 10px;
+      grid-template-columns: 10fr 1fr;
+      gap: 10px;
+    }
   }
 
   & .el-form {

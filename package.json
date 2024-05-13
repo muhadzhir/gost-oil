@@ -11,6 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@element-plus/icons-vue": "^2.3.1",
     "@types/node": "^20.11.28",
     "axios": "^1.6.8",
     "cross-env": "^7.0.3",
