@@ -1,5 +1,5 @@
 <template>
-  <div class="app">
+  <div class="app" >
     <Header />
     <router-view />
     <Footer />
@@ -15,7 +15,7 @@
 <style lang="scss">
   @import "css/index.css";
   body {
-    background-color: #007Ac5;
+    //background-color: #007Ac5;
     margin: 0;
     padding: 0;
     font-family: "Arial";

@@ -23,7 +23,7 @@
           <MazCheckbox
               v-model="personalDataConsent"
               :value="personalDataConsent"
-              class="check-numbers-privacy"
+              class="client-form-privacy"
               :class="{'client-form-privacy_danger': warningVisible}"
               @change="handlerChangePersonal"
           >
@@ -133,11 +133,16 @@ onMounted(() => {
 </script>
 
 <style lang="scss">
+@import "/src/css/client.css";
+.app {
+  //background: rebeccapurple;
+}
 .client {
   &-form {
     &-privacy {
       margin-bottom: 10px;
       font-size: 14px ;
+      color: #007Ac5;
       &_danger {
         color: #FF4545;
       }
@@ -162,7 +167,8 @@ onMounted(() => {
 
   &-title {
     display: block;
-    color: white;
+    //color: white;
+    color: #007Ac5;
     font-size: 40px;
     text-align: center;
     margin-bottom: 20px;
